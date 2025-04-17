@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şifreleme Projesi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #7a2e8d, #4c80b0);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #4c80b0;
+        }
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            resize: vertical;
+            background-color: #f7f7f7;
+        }
+        .buttons {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        button {
+            flex: 1;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: #7a2e8d;
+            color: #fff;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5e1e6c;
+        }
+        .result {
+            margin-top: 1.5rem;
+            font-weight: bold;
+            white-space: pre-wrap;
+            color: #4c80b0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Şifreleme Projesi</h1>
+        <textarea id="inputText" rows="6" placeholder="Şifrelemek istediğiniz metni buraya yazın..."></textarea>
+        <div class="buttons">
+            <button onclick="encryptText()">Şifrele</button>
+            <button onclick="clearText()">Temizle</button>
+        </div>
+        <div class="result" id="result"></div>
+    </div>
+    <script>
+        function encryptText() {
+            let text = document.getElementById('inputText').value.trim();
+            if (text === "") {
+                alert("Lütfen bir metin girin!");
+                return;
+            }
+
+            let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+            let processed = text.toUpperCase().split("").map(char => {
+                if (alphabet.includes(char)) {
+                    return alphabet.indexOf(char) + 1;
+                } else {
+                    return char;
+                }
+            });
+
+            // Sayıların küpünü al
+            processed = processed.map(val => {
+                let num = parseInt(val);
+                if (!isNaN(num)) {
+                    return Math.pow(num, 3);
+                } else {
+                    return val;
+                }
+            });
+
+            // Sayıların karekökünü al
+            processed = processed.map(val => {
+                let num = parseFloat(val);
+                if (!isNaN(num)) {
+                    return Math.sqrt(num).toFixed(1);
+                } else {
+                    return val;
+                }
+            });
+
+            // Ters çevir ve sonucu yazdır
+            let result = processed.reverse().join(" ");
+            document.getElementById('result').textContent = "Şifreli Metin: " + result;
+        }
+
+        function clearText() {
+            document.getElementById('inputText').value = "";
+            document.getElementById('result').textContent = "";
+        }
+    </script>
+</body>
+</html>
