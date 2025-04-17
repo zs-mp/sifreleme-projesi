@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şifreleme Projesi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #7a2e8d, #4c80b0); /* Mor ve mavi tonlarıyla gradient */
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #4c80b0; /* Başlık rengi mavi */
+        }
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            resize: vertical;
+            background-color: #f7f7f7;
+        }
+        .buttons {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        button {
+            flex: 1;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: #7a2e8d; /* Mor buton */
+            color: #fff;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5e1e6c; /* Mor buton hover */
+        }
+        .result {
+            margin-top: 1.5rem;
+            font-weight: bold;
+            white-space: pre-wrap;
+            color: #4c80b0; /* Mavi renk ile sonuç yazısı */
+        }
+        .info-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #4c80b0;
+            border-radius: 50%;
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .info-popup {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            font-size: 14px;
+            color: #333;
+        }
+        .info-popup p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Şifreleme Projesi</h1>
+        <textarea id="inputText" rows="6" placeholder="Şifrelemek veya çözümlenecek metni buraya yazın..."></textarea>
+        <div class="buttons">
+            <button onclick="encryptText()">Şifrele</button>
+            <button onclick="decryptText()">Çöz</button>
+            <button onclick="clearText()">Temizle</button>
+        </div>
+        <div class="result" id="result"></div>
+        
+        <!-- Soru işareti ikonu -->
+        <div class="info-icon" onclick="togglePopup()">?</div>
+        <!-- Açıklama pop-up'ı -->
+        <div class="info-popup" id="infoPopup">
+            <p><strong>Şifreleme Sistemi:</strong></p>
+            <p>1. Harfler sayılara dönüştürülür (A=1, B=2, ... Z=26)</p>
+            <p>2. Sayıların küpü alınır.</p>
+            <p>3. Sayıların karekökü hesaplanır.</p>
+            <p>4. Son olarak, şifreli metin ters çevrilir.</p>
+            <p><em>Çözme işlemi ise tersine çalışır.</em></p>
+        </div>
+    </div>
+    
+    <script>
+        function encryptText() {
+            let text = document.getElementById('inputText').value.trim();
+            if (text === "") {
+                alert("Lütfen bir metin girin!");
+                return;
+            }
+            let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""); // A-Z harfleri
+            let result = "";
+            // Adım 1: Harfleri sayılara çevir
+            text = text.toUpperCase().split("").map(char => {
+                if (alphabet.includes(char)) {
+                    return alphabet.indexOf(char) + 1;
+                } else {
+                    return char; // Harf olmayan karakteri olduğu gibi bırak
+                }
+            });
+            // Adım 2: Sayıların küpünü al
+            text = text.map(num => {
+                if (typeof num === 'number') {
+                    return Math.pow(num, 3); // Küp alma
+                } else {
+                    return num;
+                }
+            });
+            // Adım 3: Sayıların karekökünü al
+            text = text.map(num => {
+                if (typeof num === 'number') {
+                    return Math.sqrt(num).toFixed(1); // Karekök ve birler basamağına yuvarla
+                } else {
+                    return num;
+                }
+            });
+            // Adım 4: Şifreyi ters çevir ve yer değiştir
+            text = text.reverse().join(" "); // Metni ters çevir
+            // Sonuç gösterme
+            result = text;
+            document.getElementById('result').textContent = "Şifreli Metin: " + result;
+        }
+
+        function decryptText() {
+            let text = document.getElementById('inputText').value.trim();
+            if (text === "") {
+                alert("Lütfen bir metin girin!");
+                return;
+            }
+            let result = text.split(" ").reverse().join(""); // Ters çevir
+            result = result.split("").map(char => {
+                let num = parseFloat(char);
+                if (!isNaN(num)) {
+                    return Math.cbrt(num).toFixed(1); // Küp kökünü al
+                }
+                return char;
+            }).join("");
+            document.getElementById('result').textContent = "Çözülmüş Metin: " + result;
+        }
+
+        function clearText() {
+            document.getElementById('inputText').value = "";
+            document.getElementById('result').textContent = "";
+        }
+
+        function togglePopup() {
+            const popup = document.getElementById('infoPopup');
+            popup.style.display = (popup.style.display === "block") ? "none" : "block";
+        }
+    </script>
+</body>
+</html>
